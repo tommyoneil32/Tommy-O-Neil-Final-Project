@@ -1,14 +1,71 @@
 ---
-title: "Gov 50 Final Project"
-author: "Your Name Here"
-description: "My final project"
+title: Research on NFL Play Data
+author: Tommy O'Neil
+description: I am aiming to look at a correlation between the distance that a team has to go in order to get a first down and the yards that they end up gaining. 
 output:
   distill::distill_article:
     self_contained: false
 ---
 
-
+The play result is the outcome variable, yards to go is explanatory
 
 ## Project thoughts
 
-I am interested in exploring data related to...
+I am interested in exploring data related to 
+
+```{r}
+library(tidyverse)
+plays_data <- read.csv("plays.csv")
+
+plays_data <- plays_data |>
+  mutate(plays_data$yardsToGo)
+plays_data
+
+plot <- plays_data |>
+  filter(yardsToGo == "Remaining Yards") |>
+  ggplot(mapping = aes(x = plays_data$yardsToGo)) + geom_histogram()
+hist(x = plays_data$yardsToGo, main = "Yards to Go")
+```
+
+The above graph is an example of the average number of yards to gain when a team is facing a third down play, which means they have one opportunity to convert or they will likely have to punt, or in other words give the ball away. 
+
+```{r}
+plays_data <- plays_data |>
+  mutate(plays_data$playResult)
+plays_data
+
+plot <- plays_data |>
+  filter(yardsToGo == "Remaining Yards") |>
+  ggplot(mapping = aes(x = plays_data$playResult)) + geom_histogram()
+hist(x = plays_data$playResult, main = "Play Result")
+```
+histogram of distribution of outcome variable
+
+Subsequently, this histogram shows the average result of these plays, where you can see how the teams usually fare when they are faced with the tall task of trying to convert a third down play. 
+
+```{r}
+
+library(ggplot2)
+
+
+ggplot(plays_data, aes(x = yardsToGo, y = playResult)) +
+  geom_point() +
+  xlab("Yards to Go") +
+  ylab("Result of the Play")
+
+```
+Bivariate plot with explanatory variable on x-axis and outcome variable on y-axis
+```{r}
+library(broom)
+
+model <- lm(plays_data$playResult ~ plays_data$yardsToGo, plays_data = plays_data)
+
+results <- tidy(model)
+
+results
+```
+regression results for multivariate model
+```{r}
+
+```
+
