@@ -1,17 +1,32 @@
 ---
 title: Research on NFL Play Data
 author: Tommy O'Neil
-description: I am aiming to look at a correlation between the distance that a team has to go in order to get a first down and the yards that they end up gaining. 
+description: I am aiming to look at a correlation between the distance that a team has to go in order to get a first down and the yards that they end up gaining. I always found it interesting while watching football on how the perceived goal that they are trying to achieve ultimately effects the actual yardage they accumulate. It seems that there is sometimes a pronounced effect on strategy and resulting yardage gained when it comes to yards needed to obtain the first down. 
 output:
   distill::distill_article:
     self_contained: false
 ---
 
+ library(knitr)
+
+knit2html("index.Rmd")
+
+
+
+
 The play result is the outcome variable, yards to go is explanatory
 
-## Project thoughts
 
-I am interested in exploring data related to 
+Introduction
+
+Is there any correlation between distance to the first down marker and football and the resulting yardage gained? In this study I plan to take a set of data that has a vast amount of plays recorded over the past two decades from numerous games, all of which have the yardage that a specific team had to gain to get a first down, and the resulting yardage gained. All NFL teams have different strategies to an extent, but as an avid football watcher, I have always found it interesting to look at the specific distance that a team has to go in order to get a first down, and then see the result of the play. I also plan to tie in the specific down that is being played through a multivariate analysis to see if the down has even more of an effect on the result of the play. I hypothesize that there will ultimately be no statistical significance to the correlation I find between my variables, as it will show the unpredictability of the game of football. 
+
+
+
+Data and Research Design
+
+For my data, I was able to obtain a .csv file that contained extensive data on plays, one of the more interesting facets of the data being that they are all passing plays. What makes this interesting is that run plays are usually less strategic plays, used to gain a couple of yards here or there, while pass plays are consistently used to try and create big plays or to make a larger impact on the game. Pass plays are also typically used when there is a larger distance that the offense needs to gain in order to get a first down. For my research design, I will be creating multiple plots of the data, and then eventually doing a regression to see if I can discern any correlation from the outcome variable which will be the 'play result' versus the explanatory variable which will be the 'yards to go'. 
+
 
 ```{r}
 library(tidyverse)
@@ -24,10 +39,10 @@ plays_data
 plot <- plays_data |>
   filter(yardsToGo == "Remaining Yards") |>
   ggplot(mapping = aes(x = plays_data$yardsToGo)) + geom_histogram()
-hist(x = plays_data$yardsToGo, main = "Yards to Go")
+hist(x = plays_data$yardsToGo, main = "First Down Yardage", xlab = "Yards to Go", ylab = "Frequency")
 ```
 
-The above graph is an example of the average number of yards to gain when a team is facing a third down play, which means they have one opportunity to convert or they will likely have to punt, or in other words give the ball away. 
+The above graph is an example of the average number of yards to gain per each play in the data set, as is displaye through this graph, the most common yardage is typically around 10 yards as this is what each first down play in football begins with. 
 
 ```{r}
 plays_data <- plays_data |>
@@ -37,11 +52,12 @@ plays_data
 plot <- plays_data |>
   filter(yardsToGo == "Remaining Yards") |>
   ggplot(mapping = aes(x = plays_data$playResult)) + geom_histogram()
-hist(x = plays_data$playResult, main = "Play Result")
+hist(x = plays_data$playResult, main = "Results of Plays", xlab = "Play Result in Yards", ylab = "Frequency of Result")
+  
 ```
-histogram of distribution of outcome variable
 
-Subsequently, this histogram shows the average result of these plays, where you can see how the teams usually fare when they are faced with the tall task of trying to convert a third down play. 
+
+Subsequently, this histogram shows the average result of these plays, where you can see how the graphs differ greatly when it comes to yards gained on the play. The interesting part of this graph is how you can go into the negatives which there seems to actually be a level of frequency to.  
 
 ```{r}
 
@@ -55,6 +71,11 @@ ggplot(plays_data, aes(x = yardsToGo, y = playResult)) +
 
 ```
 Bivariate plot with explanatory variable on x-axis and outcome variable on y-axis
+
+
+Looking at this plot, it is the combination of the two graphs above, where I combined both the playy result, along with the yards to go in terms of that specific play. As is typical within a football game, there are some obvious outliers when it comes to this particular graph, however it is interesting to see that there seems to be more of a consistency when it comes to yards to go versus the result of the play. This is just an example of how unpredictable the game of football can be when it comes down to it, which will ultimately come into play when discussing the results of these tests. 
+
+
 ```{r}
 library(broom)
 
@@ -65,7 +86,44 @@ results <- tidy(model)
 results
 ```
 regression results for multivariate model
+
+
+
+
+
 ```{r}
 
+
+model_formula <- plays_data$playResult ~ plays_data$yardsToGo + plays_data$down 
+
+fit <- lm(model_formula, plays_data)
+
+
+predictions <- predict(fit, plays_data = plays_data)
+
+
+summary(fit)
+
+ggplot(plays_data, aes(x = yardsToGo, y = playResult)) +
+  geom_point() +
+  geom_line(aes(y = predictions), color = "red") +
+  xlab("Yards to Go") +
+  ylab("Result of the Play")
 ```
+multivariate regression model
+
+
+This is the multivariate regression model of the yards to go, result of the play, and the down to go in question. The regression serves to show if there is any type of correlation between the variables. Because of the vast amount of data points that are being used it is difficult to tell whether or not the correlation is statistically significant or not simply by looking at it, but this is something that will be discussed within the results part of this study. 
+
+
+
+
+
+Results
+
+
+
+
+
+
 
